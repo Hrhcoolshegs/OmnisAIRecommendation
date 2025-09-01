@@ -11,6 +11,10 @@ interface ChatMessage {
   type: 'user' | 'bot';
   content: string;
   timestamp: Date;
+  productInfo?: {
+    productName: string;
+    productId: string;
+  };
 }
 
 export default function ChatBubble({ message, onViewRecommendation }: ChatBubbleProps) {
@@ -30,17 +34,17 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
   ];
 
   const responses: { [key: string]: string } = {
-    "financial health": "Great question! Your current financial health score is 99/100 - excellent! To maintain this, continue your 15% savings rate and consider diversifying with our Smart Investment Portfolio. I also recommend setting up automatic transfers to make saving effortless.",
+    "financial health": "Great question! Your current financial health score is 99/100 - excellent! To maintain this, continue your 15% savings rate and consider diversifying with our Smart Investment Portfolio. I also recommend setting up automatic transfers to make saving effortless.|PRODUCT:Smart Investment Portfolio|ID:investment-plan",
     
-    "savings products": "Based on your profile, I recommend three products: 1) Flexible Savings Plan (12% interest, no lock-in) - perfect for your emergency fund, 2) Fixed Deposit (15% interest, 6-month term) for higher returns, and 3) Target Savings for your ₦50,000 goal with automatic monthly deductions.",
+    "savings products": "Based on your profile, I recommend three products: 1) Flexible Savings Plan (12% interest, no lock-in) - perfect for your emergency fund, 2) Fixed Deposit (15% interest, 6-month term) for higher returns, and 3) Target Savings for your ₦50,000 goal with automatic monthly deductions.|PRODUCT:Flexible Savings Plan|ID:flexible-savings",
     
-    "saving monthly": "With your ₦850,000 monthly income, I recommend saving ₦127,500 (15% - which you're already doing!). To reach your ₦50,000 goal in 4 months, save an additional ₦7,500 monthly. This keeps you well within your safe spending limit of ₦70,000 weekly.",
+    "saving monthly": "With your ₦850,000 monthly income, I recommend saving ₦127,500 (15% - which you're already doing!). To reach your ₦50,000 goal in 4 months, save an additional ₦7,500 monthly. This keeps you well within your safe spending limit of ₦70,000 weekly.|PRODUCT:Target Savings Plan|ID:target-savings",
     
-    "investment": "Perfect timing! With your stable income, consider our Smart Investment Portfolio: 40% government bonds (low risk), 35% blue-chip stocks (medium risk), 20% mutual funds (diversified), and 5% tech stocks (growth potential). Minimum investment: ₦10,000. Expected annual return: 18-22%.",
+    "investment": "Perfect timing! With your stable income, consider our Smart Investment Portfolio: 40% government bonds (low risk), 35% blue-chip stocks (medium risk), 20% mutual funds (diversified), and 5% tech stocks (growth potential). Minimum investment: ₦10,000. Expected annual return: 18-22%.|PRODUCT:Smart Investment Portfolio|ID:investment-plan",
     
-    "savings goal": "Excellent goal! To reach ₦50,000 faster: 1) Increase monthly savings by ₦2,500 (reach goal in 3 months), 2) Use our Round-Up feature to save spare change, 3) Set up automatic transfers on salary day, 4) Consider our High-Yield Savings at 15% interest. You're already 10% there!",
+    "savings goal": "Excellent goal! To reach ₦50,000 faster: 1) Increase monthly savings by ₦2,500 (reach goal in 3 months), 2) Use our Round-Up feature to save spare change, 3) Set up automatic transfers on salary day, 4) Consider our High-Yield Savings at 15% interest. You're already 10% there!|PRODUCT:High-Yield Savings|ID:high-yield-savings",
     
-    "insurance": "Smart thinking! I recommend: 1) Life Insurance (₦2,000/month premium, ₦5M coverage) - essential for SME owners, 2) Health Insurance (₦1,500/month, comprehensive coverage), 3) Business Protection Insurance for your SME. Total monthly cost: ₦3,500 - well within your budget."
+    "insurance": "Smart thinking! I recommend: 1) Life Insurance (₦2,000/month premium, ₦5M coverage) - essential for SME owners, 2) Health Insurance (₦1,500/month, comprehensive coverage), 3) Business Protection Insurance for your SME. Total monthly cost: ₦3,500 - well within your budget.|PRODUCT:Life Insurance Plan|ID:life-insurance"
   };
 
   useEffect(() => {
@@ -73,6 +77,23 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
     setIsExpanded(false);
   };
 
+  const getProductInfo = (userInput: string): { productName: string; productId: string } | null => {
+    const input = userInput.toLowerCase();
+    
+    for (const [key, response] of Object.entries(responses)) {
+      if (input.includes(key)) {
+        const parts = response.split('|');
+        if (parts.length >= 3) {
+          return {
+            productName: parts[1].replace('PRODUCT:', ''),
+            productId: parts[2].replace('ID:', '')
+          };
+        }
+      }
+    }
+    return null;
+  };
+
   const handleSendMessage = (content: string) => {
     if (!content.trim()) return;
 
@@ -87,6 +108,8 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
 
+    const productInfo = getProductInfo(content);
+
     // Generate bot response
     setTimeout(() => {
       const botResponse = generateResponse(content);
@@ -94,7 +117,8 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
         id: (Date.now() + 1).toString(),
         type: 'bot',
         content: botResponse,
-        timestamp: new Date()
+        timestamp: new Date(),
+        productInfo: productInfo
       };
       setMessages(prev => [...prev, botMessage]);
     }, 1000);
@@ -105,7 +129,7 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
     
     for (const [key, response] of Object.entries(responses)) {
       if (input.includes(key)) {
-        return response;
+        return response.split('|')[0]; // Return only the text part
       }
     }
     
