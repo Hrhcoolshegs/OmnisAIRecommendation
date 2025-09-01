@@ -138,7 +138,29 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
   };
 
   const handleTemplateQuestion = (question: string) => {
-    handleSendMessage(question);
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: question.trim(),
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    
+    const productInfo = getProductInfo(question);
+
+    // Generate bot response
+    setTimeout(() => {
+      const botResponse = generateResponse(question);
+      const botMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: botResponse,
+        timestamp: new Date(),
+        productInfo: productInfo
+      };
+      setMessages(prev => [...prev, botMessage]);
+    }, 1000);
   };
 
   return (
