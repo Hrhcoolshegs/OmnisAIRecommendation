@@ -318,10 +318,9 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
-                  </div>
                 </div>
-                <button
-            {/* Content */}
+              </div>
+              
               {/* Content */}
               <div className="p-4">
                 <div className="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
