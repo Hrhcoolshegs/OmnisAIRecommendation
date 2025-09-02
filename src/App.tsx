@@ -111,7 +111,7 @@ export default function App() {
         )}
 
         {/* Floating Chat Bubble */}
-        {activeTab === 'home' && !showDashboard && (
+        {activeTab === 'home' && (
           <ChatBubble
             message={chatMessage}
             onViewRecommendation={handleViewRecommendation}

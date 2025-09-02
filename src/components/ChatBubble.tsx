@@ -277,73 +277,76 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
       )}
 
       {/* Main Chat Bubble */}
-      <div className={`fixed z-50 transition-all duration-300 ease-out ${
-        isExpanded 
-          ? 'bottom-4 right-4 left-4 lg:left-auto lg:max-w-sm lg:min-w-80' 
-          : 'bottom-6 right-4 lg:right-6'
-      }`}>
+      {!showChatPanel && (
+        <div className={`fixed z-50 transition-all duration-300 ease-out ${
+          isExpanded 
+            ? 'bottom-4 right-4 left-4 lg:left-auto lg:max-w-sm lg:min-w-80' 
+            : 'bottom-6 right-4 lg:right-6'
+        }`}>
         
-        {!isExpanded ? (
-          /* Collapsed State - Just Icon */
-          <div 
-            onClick={() => setIsExpanded(true)}
-            className="w-14 h-14 bg-slate-800 hover:bg-slate-900 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center"
-          >
-            <MessageCircle className="w-6 h-6 text-white" />
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full animate-pulse border-2 border-white" />
-          </div>
-        ) : (
-          /* Expanded State - Recommendation Card */
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-            
-            {/* Header */}
-            <div className="bg-slate-800 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-sm">OMNIS</h3>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                      <p className="text-slate-300 text-xs">AI Financial Concierge</p>
+          {!isExpanded ? (
+            /* Collapsed State - Just Icon */
+            <div 
+              onClick={() => setIsExpanded(true)}
+              className="w-14 h-14 bg-slate-800 hover:bg-slate-900 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center"
+            >
+              <MessageCircle className="w-6 h-6 text-white" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full animate-pulse border-2 border-white" />
+            </div>
+          ) : (
+            /* Expanded State - Recommendation Card */
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+              
+              {/* Header */}
+              <div className="bg-slate-800 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-white" />
                     </div>
+                    <div>
+                      <h3 className="text-white font-semibold text-sm">OMNIS</h3>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                        <p className="text-slate-300 text-xs">AI Financial Concierge</p>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsExpanded(false)}
+                    className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors duration-200"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
                   </div>
                 </div>
                 <button
-                  onClick={() => setIsExpanded(false)}
-                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors duration-200"
-                >
-                  <X className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            </div>
-
             {/* Content */}
-            <div className="p-4">
-              <div className="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
-                <p className="text-slate-800 text-sm leading-relaxed">{message}</p>
-              </div>
-              
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleMaybeLater}
-                  className="flex-1 bg-slate-100 text-slate-700 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-slate-200"
-                >
-                  Maybe Later
-                </button>
-                <button
-                  onClick={handleViewRecommendation}
-                  className="flex-1 bg-slate-800 text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-slate-900 hover:shadow-lg transform hover:scale-105 active:scale-95"
-                >
-                  View Recommendation
-                </button>
+              {/* Content */}
+              <div className="p-4">
+                <div className="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
+                  <p className="text-slate-800 text-sm leading-relaxed">{message}</p>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleMaybeLater}
+                    className="flex-1 bg-slate-100 text-slate-700 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-slate-200"
+                  >
+                    Maybe Later
+                  </button>
+                  <button
+                    onClick={handleViewRecommendation}
+                    className="flex-1 bg-slate-800 text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-slate-900 hover:shadow-lg transform hover:scale-105 active:scale-95"
+                  >
+                    View Recommendation
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </>
   );
 }
