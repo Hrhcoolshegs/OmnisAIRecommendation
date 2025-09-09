@@ -120,12 +120,10 @@ export default function App() {
         )}
 
         {/* Smart Banner Notification */}
-        {activeTab === 'home' && (
-          <SmartBanner
-            onApplyRecommendation={handleApplyRecommendation}
-            onViewRecommendation={handleViewRecommendation}
-          />
-        )}
+        <SmartBanner
+          onApplyRecommendation={handleApplyRecommendation}
+          onViewRecommendation={handleViewRecommendation}
+        />
 
         {/* Bottom Navigation */}
         <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
