@@ -278,10 +278,10 @@ export default function ChatBubble({ message, onViewRecommendation }: ChatBubble
 
       {/* Main Chat Bubble */}
       {!showChatPanel && (
-        <div className={`fixed z-50 transition-all duration-300 ease-out ${
+        <div className={`fixed z-40 transition-all duration-300 ease-out ${
           isExpanded 
-            ? 'bottom-4 right-4 left-4 lg:left-auto lg:max-w-sm lg:min-w-80' 
-            : 'bottom-6 right-4 lg:right-6'
+            ? 'bottom-20 right-4 left-4 lg:left-auto lg:max-w-sm lg:min-w-80' 
+            : 'bottom-24 right-4 lg:right-6'
         }`}>
         
           {!isExpanded ? (
