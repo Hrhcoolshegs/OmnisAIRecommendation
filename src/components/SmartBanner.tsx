@@ -9,34 +9,44 @@ interface SmartBannerProps {
 export default function SmartBanner({ onApplyRecommendation, onViewRecommendation }: SmartBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Show banner after 3 seconds
+  // Initial banner appearance after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!isDismissed) {
-        setIsVisible(true);
-      }
+      setIsVisible(true);
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [isDismissed]);
+  }, []);
 
-  // Auto-dismiss after 30 seconds if no interaction
+  // Continuous loop management - handles auto-dismiss and reappearance
   useEffect(() => {
+    // Clear any existing timer
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
     if (isVisible && !isExpanded) {
+      // Auto-dismiss after 30 seconds when visible and collapsed
       timeoutRef.current = setTimeout(() => {
-        handleDismiss();
+        setIsVisible(false);
       }, 30000);
+    } else if (!isVisible && !isExpanded) {
+      // Reappear after 60 seconds when not visible and not expanded
+      timeoutRef.current = setTimeout(() => {
+        setIsVisible(true);
+      }, 60000);
     }
 
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, [isVisible, isExpanded]);
@@ -51,7 +61,6 @@ export default function SmartBanner({ onApplyRecommendation, onViewRecommendatio
 
   const handleDismiss = () => {
     setIsVisible(false);
-    setIsDismissed(true);
     clearAutoDismiss();
   };
 
@@ -94,12 +103,14 @@ export default function SmartBanner({ onApplyRecommendation, onViewRecommendatio
 
   const handleApplyNow = () => {
     onApplyRecommendation('flexible-savings');
-    handleDismiss();
+    setIsVisible(false);
+    clearAutoDismiss();
   };
 
   const handleViewMore = () => {
     onViewRecommendation();
-    handleDismiss();
+    setIsVisible(false);
+    clearAutoDismiss();
   };
 
   if (!isVisible) return null;
