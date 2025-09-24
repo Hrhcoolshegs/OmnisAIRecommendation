@@ -11,6 +11,7 @@ import RecommendationModal from './components/RecommendationModal';
 import TransactionModal from './components/TransactionModal';
 import FeedbackModal from './components/FeedbackModal';
 import Dashboard from './components/Dashboard';
+import SmartBanner from './components/SmartBanner';
 import { dummyUser, flexibleSavingsRecommendation } from './data/userData';
 import { TransactionResult } from './types/user';
 
@@ -117,6 +118,12 @@ export default function App() {
             onViewRecommendation={handleViewRecommendation}
           />
         )}
+
+        {/* Smart Banner Notification */}
+        <SmartBanner
+          onApplyRecommendation={handleApplyRecommendation}
+          onViewRecommendation={handleViewRecommendation}
+        />
 
         {/* Bottom Navigation */}
         <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
