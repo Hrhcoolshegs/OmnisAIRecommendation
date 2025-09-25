@@ -21,6 +21,13 @@ export default function App() {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
+  
+  // Add tracking data state
+  const [trackingData, setTrackingData] = useState<{
+    tokenId: string;
+    recommendationId: string;
+  } | null>(null);
+  
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     success: true,
     message: "Transaction Successful!",
@@ -36,11 +43,28 @@ export default function App() {
     setShowRecommendationModal(true);
   };
 
-  const handleApplyRecommendation = (recommendationId: string) => {
+  // Updated to handle tracking data from RecommendationBanner
+  const handleApplyRecommendation = (
+    recommendationId: string, 
+    tokenId?: string, 
+    apiRecommendationId?: string
+  ) => {
+    console.log('Recommendation clicked:', { recommendationId, tokenId, apiRecommendationId });
+    
+    // Store tracking data for the modal
+    if (tokenId && apiRecommendationId) {
+      setTrackingData({
+        tokenId,
+        recommendationId: apiRecommendationId
+      });
+    }
+    
     setShowRecommendationModal(true);
   };
 
+  // This handles the "Apply Now" button in the modal (triggers "converted" tracking)
   const handleApplyNow = () => {
+    console.log('Apply Now clicked - converted tracking will be handled by RecommendationModal');
     setShowRecommendationModal(false);
     setShowTransactionModal(true);
   };
@@ -49,11 +73,19 @@ export default function App() {
     setShowTransactionModal(false);
     setShowFeedbackModal(true);
     setShowDashboard(true);
+    // Clear tracking data after transaction is complete
+    setTrackingData(null);
   };
 
   const handleSubmitFeedback = (rating: 'yes' | 'no', comment?: string) => {
     setFeedback({ rating, comment });
     setShowFeedbackModal(false);
+  };
+
+  const handleModalClose = () => {
+    setShowRecommendationModal(false);
+    // Clear tracking data when modal is closed without conversion
+    setTrackingData(null);
   };
 
   const chatMessage = `Based on your recent deposit of ₦${dummyUser.recentTransaction.amount.toLocaleString()}, we recommend a Flexible Savings Plan. Want to learn more?`;
@@ -121,7 +153,7 @@ export default function App() {
 
         {/* Smart Banner Notification */}
         <SmartBanner
-          onApplyRecommendation={handleApplyRecommendation}
+          onApplyRecommendation={(id) => handleApplyRecommendation(id)}
           onViewRecommendation={handleViewRecommendation}
         />
 
@@ -131,9 +163,11 @@ export default function App() {
         {/* Modals */}
         <RecommendationModal
           isOpen={showRecommendationModal}
-          onClose={() => setShowRecommendationModal(false)}
+          onClose={handleModalClose}
           recommendation={flexibleSavingsRecommendation}
           onApply={handleApplyNow}
+          tokenId={trackingData?.tokenId}
+          recommendationId={trackingData?.recommendationId}
         />
 
         <TransactionModal

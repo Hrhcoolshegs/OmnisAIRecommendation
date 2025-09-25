@@ -4,7 +4,7 @@ import { User } from '../types/user';
 
 interface RecommendationBannerProps {
   user: User;
-  onApplyRecommendation: (recommendationId: string) => void;
+  onApplyRecommendation: (recommendationId: string, tokenId?: string, apiRecommendationId?: string) => void;
 }
 
 interface Recommendation {
@@ -67,10 +67,39 @@ export default function RecommendationBanner({ user, onApplyRecommendation }: Re
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [trackingData, setTrackingData] = useState<{tokenId: string, recommendationId: string} | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const userId = "7ba341e4-62f7-4f51-a1fa-51cad91b27be-1750752402300";
   const apiUrl = `http://g488k00w480gw0ocwkwowo4g.138.197.129.114.sslip.io:8046/api/v1/recommend?user_id=${userId}&top_k=5`;
+
+  // Function to track interactions
+  const trackInteraction = async (action: 'clicked' | 'converted', recommendationId: string) => {
+    if (!trackingData) {
+      console.warn('Missing tracking data');
+      return;
+    }
+
+    try {
+      const trackingUrl = `http://g488k00w480gw0ocwkwowo4g.138.197.129.114.sslip.io:8046/api/v1/recommend/interaction?token_id=${encodeURIComponent(trackingData.tokenId)}&recommendation_id=${trackingData.recommendationId}&action=${action}`;
+      
+      const response = await fetch(trackingUrl, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(`Successfully tracked ${action} for ${recommendationId}:`, data);
+    } catch (error) {
+      console.error(`Error tracking ${action}:`, error);
+    }
+  };
 
   const parseProductRecommended = (productRecommended: string[]): ParsedData => {
     const parsed: ParsedData = {};
@@ -227,6 +256,14 @@ export default function RecommendationBanner({ user, onApplyRecommendation }: Re
             data.recommendations.user_data_found && 
             data.recommendations.product_recommended?.length > 0) {
           
+          // Store tracking data
+          if (data.tracking) {
+            setTrackingData({
+              tokenId: data.tracking.token_id,
+              recommendationId: data.tracking.recommendation_id
+            });
+          }
+          
           const parsedData = parseProductRecommended(data.recommendations.product_recommended);
           const dynamicRecommendations = createRecommendationsFromData(parsedData);
           
@@ -269,6 +306,16 @@ export default function RecommendationBanner({ user, onApplyRecommendation }: Re
       const newIndex = Math.round(scrollLeft / (cardWidth + gap));
       setCurrentIndex(Math.min(newIndex, recommendations.length - 1));
     }
+  };
+
+  // Handle CTA button click - tracks "clicked"
+  const handleRecommendationClick = async (recommendationId: string) => {
+    await trackInteraction('clicked', recommendationId);
+    onApplyRecommendation(
+      recommendationId, 
+      trackingData?.tokenId, 
+      trackingData?.recommendationId
+    );
   };
 
   useEffect(() => {
@@ -391,7 +438,7 @@ export default function RecommendationBanner({ user, onApplyRecommendation }: Re
               </p>
               
               <button
-                onClick={() => onApplyRecommendation(rec.id)}
+                onClick={() => handleRecommendationClick(rec.id)}
                 className="w-full bg-white text-slate-900 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-slate-50 transform hover:scale-105 active:scale-95"
               >
                 {rec.cta}
